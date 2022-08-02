@@ -1,4 +1,5 @@
 import { FC } from "react";
+import { Link } from 'react-router-dom';
 import {
   Avatar,
   Button,
@@ -48,7 +49,7 @@ const ProductCard: FC<ProductCardProps> = ({ product }) => {
       </CardContent>
       <CardActions>
         <Button size="small">Add to cart</Button>
-        <Button size="small">View</Button>
+        <Button size="small" component={Link} to={`/catalog/${product.id}`}>View</Button>
       </CardActions>
     </Card>
   );

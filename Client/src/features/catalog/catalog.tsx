@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import axios from 'axios';
 
 import ProductList from "./product-list";
 
@@ -8,11 +9,11 @@ const Catalog = () => {
   const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
-    fetch("https://localhost:5000/api/Products")
-      .then((resp) => resp.json())
-      .then((data) => {
-        setProducts(data);
-      });
+    axios.get("https://localhost:5000/api/Products")
+      .then(resp => {
+        setProducts(resp.data);
+      })
+      .catch(error => console.log(error));
   }, []);
 
   return (
