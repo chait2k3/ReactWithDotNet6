@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using API.Data;
+using API.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,13 +17,6 @@ builder.Services.AddDbContext<StoreContext>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
 // migrate any database changes on startup (includes initial db creation)
 // use logger to show any error messages
 using var scope = app.Services.CreateScope();
@@ -37,6 +31,18 @@ try
     logger.LogError(ex, "Problem in migrating data");
 }
 
+// Configure the HTTP request pipeline.
+// error handling middleware
+app.UseMiddleware<ExceptionMiddleware>();
+
+// swagger middleware
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+// http request redirection
 app.UseHttpsRedirection();
 
 // global cors policy
@@ -46,6 +52,7 @@ app.UseCors(x =>
     .AllowAnyMethod()
 );
 
+// autentication and authorization middleware
 app.UseAuthorization();
 
 app.MapControllers();

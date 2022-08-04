@@ -10,9 +10,7 @@ using API.Entities;
 
 namespace API.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class ProductsController : ControllerBase
+    public class ProductsController : BaseApiController
     {
         private readonly ILogger<ProductsController> _logger;
         private readonly StoreContext _context;
@@ -26,6 +24,7 @@ namespace API.Controllers
         public async Task<ActionResult<List<Product>>> GetProducts()
         {
             var products = await _context.Products.ToListAsync();
+            if(products == null) return NotFound();
             return Ok(products);
         }
 
