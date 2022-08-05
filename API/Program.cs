@@ -50,6 +50,7 @@ app.UseCors(x =>
     x.AllowAnyOrigin()
     .AllowAnyHeader()
     .AllowAnyMethod()
+    .AllowCredentials()
 );
 
 // autentication and authorization middleware
