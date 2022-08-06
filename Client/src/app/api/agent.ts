@@ -3,7 +3,8 @@ import { toast } from 'react-toastify';
 
 const sleep = () => new Promise(resolve => setTimeout(resolve, 500));
 
-axios.defaults.baseURL = "https://localhost:5000/api/";
+axios.defaults.baseURL = "http://localhost:5001/api/";
+axios.defaults.withCredentials = true;  // for using cookies, user credentials etc
 
 axios.interceptors.response.use(async response => {
     if (process.env.NODE_ENV === 'development') await sleep();
@@ -67,9 +68,16 @@ const Catalog = {
     details: (id: string | undefined) => requests.get(`products/${id}`)
 };
 
+const Basket = {
+    get: () => requests.get('basket'),
+    addItem: (productId: number, quantity = 1) => requests.post(`basket?productId=${productId}&quantity=${quantity}`, {}),
+    removeItem: (productId: number, quantity = 1) => requests.delete(`basket?productId=${productId}&quantity=${quantity}`)
+};
+
 const agent = {
     TestErrors,
-    Catalog
+    Catalog,
+    Basket
 };
 
 export default agent;

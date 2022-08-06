@@ -9,9 +9,10 @@ import {
   Toolbar,
   Typography,
 } from "@mui/material";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { ShoppingCart } from "@mui/icons-material";
 import { Box } from "@mui/system";
+import { useStoreContext } from '../context/store-contect';
 
 interface HeaderProps {
   darkMode: boolean;
@@ -41,6 +42,11 @@ const navStyles = {
 };
 
 const Header: FC<HeaderProps> = (props) => {
+  const { basket } = useStoreContext();
+  const itemCount = basket?.items.reduce((acc, currItem) => {
+    return acc + currItem.quantity
+  }, 0);
+  
   return (
     <AppBar position="static" sx={{ marginBottom: 4 }}>
       <Toolbar
@@ -50,7 +56,7 @@ const Header: FC<HeaderProps> = (props) => {
           alignItems: "center",
         }}
       >
-        <Box display='flex' alignItems='center'>
+        <Box display="flex" alignItems="center">
           <Typography
             variant="h6"
             component={NavLink}
@@ -70,9 +76,14 @@ const Header: FC<HeaderProps> = (props) => {
           ))}
         </List>
 
-        <Box display='flex' alignItems='center'>
-          <IconButton size="large" sx={{ color: "inherit" }}>
-            <Badge badgeContent={4} color="secondary">
+        <Box display="flex" alignItems="center">
+          <IconButton
+            component={Link}
+            to="/basket"
+            size="large"
+            sx={{ color: "inherit" }}
+          >
+            <Badge badgeContent={itemCount} color="secondary">
               <ShoppingCart />
             </Badge>
           </IconButton>

@@ -43,14 +43,15 @@ if (app.Environment.IsDevelopment())
 }
 
 // http request redirection
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 
 // global cors policy
 app.UseCors(x =>
-    x.AllowAnyOrigin()
-    .AllowAnyHeader()
+    x.AllowAnyHeader()
     .AllowAnyMethod()
+    //.AllowAnyOrigin()
     .AllowCredentials()
+    .WithOrigins("http://localhost:3000")
 );
 
 // autentication and authorization middleware
