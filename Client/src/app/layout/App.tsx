@@ -16,14 +16,16 @@ import ProductDetails from "../../features/catalog/product-details";
 import ServerError from '../errors/server-error';
 import NotFoundError from '../errors/not-found-error';
 import BasketPage from "../../features/basket/basket-page";
-import { useStoreContext } from '../context/store-contect';
 import { getCookie } from '../utils/utils';
 import agent from '../api/agent';
 import LoadingComponent from './loading-component';
 import CheckoutPage from '../../features/checkout/checkout-page';
+import { useAppDispatch } from '../store/configure-store';
+import { setBasket } from '../../features/basket/basket-slice';
 
 const App = () => {
-  const { setBasket } = useStoreContext();
+  const dispatch = useAppDispatch();
+
   const [loading, setLoading] = useState(true);
   
   const [darkMode, setDarkMode] = useState(false);
@@ -32,13 +34,13 @@ const App = () => {
     const buyerId = getCookie("buyerId");
     if(buyerId) {
       agent.Basket.get()
-        .then(data => setBasket(data))
+        .then(data => dispatch(setBasket(data)))
         .catch(error => console.log(error))
         .finally(() => setLoading(false));
     } else {
       setLoading(false);
     }
-  },[setBasket]);
+  },[dispatch]);
 
   const theme = createTheme({
     palette: {

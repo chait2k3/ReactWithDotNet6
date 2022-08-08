@@ -12,7 +12,7 @@ import {
 import { Link, NavLink } from "react-router-dom";
 import { ShoppingCart } from "@mui/icons-material";
 import { Box } from "@mui/system";
-import { useStoreContext } from '../context/store-contect';
+import { useAppSelector } from '../store/configure-store';
 
 interface HeaderProps {
   darkMode: boolean;
@@ -42,7 +42,7 @@ const navStyles = {
 };
 
 const Header: FC<HeaderProps> = (props) => {
-  const { basket } = useStoreContext();
+  const { basket } = useAppSelector(state => state.basket);
   const itemCount = basket?.items.reduce((acc, currItem) => {
     return acc + currItem.quantity
   }, 0);

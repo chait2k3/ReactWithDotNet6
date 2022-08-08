@@ -1,4 +1,4 @@
-import { useState, Fragment } from "react";
+import { Fragment } from "react";
 import {
   Box,
   Button,
@@ -16,36 +16,21 @@ import { Add, Delete, Remove } from "@mui/icons-material";
 import { LoadingButton } from "@mui/lab";
 import { Link } from 'react-router-dom';
 
-import { useStoreContext } from "../../app/context/store-contect";
-import agent from "../../app/api/agent";
 import BasketSummary from "./basket-summary";
 import { currencyFormat } from '../../app/utils/utils';
+import { useAppSelector, useAppDispatch } from '../../app/store/configure-store';
+import { addBasketItemAsync, removeBasketItemAsync } from './basket-slice';
 
 const BasketPage = () => {
-  const { basket, setBasket, removeItem } = useStoreContext();
-  const [loadingStatus, setLoadingStatus] = useState({
-    loading: false,
-    name: "",
-  });
-
-  const handleAddItem = (productId: number, name: string) => {
-    setLoadingStatus({ loading: true, name });
-    agent.Basket.addItem(productId)
-      .then((data) => setBasket(data))
-      .catch((error) => console.log(error))
-      .finally(() => setLoadingStatus({ loading: false, name: "" }));
+  const { basket, status } = useAppSelector(state => state.basket);
+  const dispatch = useAppDispatch();
+  
+  const handleAddItem = (productId: number) => {
+    dispatch(addBasketItemAsync({productId}));
   };
 
-  const handleRemoveItem = (
-    productId: number,
-    quantity: number,
-    name: string
-  ) => {
-    setLoadingStatus({ loading: true, name });
-    agent.Basket.removeItem(productId, quantity)
-      .then(() => removeItem(productId, quantity))
-      .catch((error) => console.log(error))
-      .finally(() => setLoadingStatus({ loading: false, name: "" }));
+  const handleRemoveItem = (productId: number, quantity: number, name: string) => {
+    dispatch(removeBasketItemAsync({productId, quantity, name}));
   };
 
   if (!basket)
@@ -86,30 +71,16 @@ const BasketPage = () => {
                 <TableCell align="center">
                   <LoadingButton
                     color="error"
-                    loading={
-                      loadingStatus.loading &&
-                      loadingStatus.name === "rem" + item.productId
-                    }
-                    onClick={() =>
-                      handleRemoveItem(
-                        item.productId,
-                        1,
-                        "rem" + item.productId
-                      )
-                    }
+                    loading={status === ("pendingRemoveItem" + item.productId + "rem")}
+                    onClick={() => handleRemoveItem(item.productId, 1,"rem")}
                   >
                     <Remove />
                   </LoadingButton>
                   {item.quantity}
                   <LoadingButton
                     color="secondary"
-                    loading={
-                      loadingStatus.loading &&
-                      loadingStatus.name === "add" + item.productId
-                    }
-                    onClick={() =>
-                      handleAddItem(item.productId, "add" + item.productId)
-                    }
+                    loading={status === ("pendingAddItem" + item.productId)}
+                    onClick={() => handleAddItem(item.productId)}
                   >
                     <Add />
                   </LoadingButton>
@@ -120,17 +91,8 @@ const BasketPage = () => {
                 <TableCell align="right">
                   <LoadingButton
                     color="error"
-                    loading={
-                      loadingStatus.loading &&
-                      loadingStatus.name === "del" + item.productId
-                    }
-                    onClick={() =>
-                      handleRemoveItem(
-                        item.productId,
-                        item.quantity,
-                        "del" + item.productId
-                      )
-                    }
+                    loading={status === ("pendingRemoveItem" + item.productId + "del")}
+                    onClick={() => handleRemoveItem(item.productId, item.quantity, "del")}
                   >
                     <Delete />
                   </LoadingButton>

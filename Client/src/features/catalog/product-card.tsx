@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC } from "react";
 import { Link } from "react-router-dom";
 import {
   Avatar,
@@ -12,24 +12,20 @@ import {
 } from "@mui/material";
 
 import { Product } from "../../app/models/product";
-import agent from "../../app/api/agent";
 import { LoadingButton } from "@mui/lab";
-import { useStoreContext } from '../../app/context/store-contect';
+import { useAppDispatch, useAppSelector } from '../../app/store/configure-store';
+import { addBasketItemAsync } from '../basket/basket-slice';
 
 interface ProductCardProps {
   product: Product;
 }
 
 const ProductCard: FC<ProductCardProps> = ({ product }) => {
-  const [loading, setLoading] = useState(false);
-  const { setBasket } = useStoreContext();
+  const { status } = useAppSelector(state => state.basket);
+  const dispatch = useAppDispatch();
 
   const handleAddItem = (productId: number) => {
-    setLoading(true);
-    agent.Basket.addItem(productId)
-      .then(data => setBasket(data))
-      .catch((error) => console.log(error))
-      .finally(() => setLoading(false));
+    dispatch(addBasketItemAsync({productId}));
   };
 
   return (
@@ -64,7 +60,7 @@ const ProductCard: FC<ProductCardProps> = ({ product }) => {
       </CardContent>
       <CardActions>
         <LoadingButton
-          loading={loading}
+          loading={status === ("pendingAddItem" + product.id)}
           size="small"
           onClick={() => handleAddItem(product.id)}
         >

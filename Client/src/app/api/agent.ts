@@ -65,7 +65,7 @@ const TestErrors = {
 
 const Catalog = {
     list: () => requests.get("products"),
-    details: (id: string | undefined) => requests.get(`products/${id}`)
+    details: (id: number) => requests.get(`products/${id}`)
 };
 
 const Basket = {

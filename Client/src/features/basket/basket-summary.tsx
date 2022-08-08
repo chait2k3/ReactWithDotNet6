@@ -1,6 +1,6 @@
 import { Fragment } from "react";
-import { useStoreContext } from '../../app/context/store-contect';
 import { currencyFormat } from '../../app/utils/utils';
+import { useAppSelector } from '../../app/store/configure-store';
 import {
   TableContainer,
   Paper,
@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 
 const BasketSummary = () => {
-  const { basket } = useStoreContext();  
+  const { basket } = useAppSelector(state => state.basket);
   const subtotal = basket?.items.reduce((acc, currItem) => {
     return acc + (currItem.price * currItem.quantity);
   }, 0) ?? 0;
