@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using API.Data;
 using API.Entities;
+using API.Extensions;
+using API.RequestHelpers;
 
 namespace API.Controllers
 {
@@ -21,11 +23,21 @@ namespace API.Controllers
         }
 
         [HttpGet]  // api/products
-        public async Task<ActionResult<List<Product>>> GetProducts()
+        public async Task<ActionResult<PagedList<Product>>> GetProducts([FromQuery]ProductParams productPatams)
         {
-            var products = await _context.Products.ToListAsync();
+            // create a query for searching, sorting, filtering and pagination.
+            var query = _context.Products
+                    .Sort(productPatams.OrderBy)
+                    .Search(productPatams.SearchTerm)
+                    .Filter(productPatams.Brands, productPatams.Types)
+                    .AsQueryable();
+            
+            var products = await PagedList<Product>.ToPagedList(query, productPatams.PageNumber, productPatams.PageSize);
+            
+            Response.AddPaginationHeader(products.MetaData);
+
             if(products == null) return NotFound();
-            return Ok(products);
+            return products;
         }
 
         [HttpGet("{id}")]  // api/products/3
@@ -34,6 +46,15 @@ namespace API.Controllers
             var product = await _context.Products.FindAsync(id);
             if(product == null) return NotFound();
             return Ok(product);
+        }
+
+        [HttpGet("filters")]
+        public async Task<IActionResult> GetFilters()
+        {
+            var brands = await _context.Products.Select(p => p.Brand).Distinct().ToListAsync();
+            var types = await _context.Products.Select(p => p.Type).Distinct().ToListAsync();
+            
+            return Ok(new { brands, types });
         }
     }
 }
