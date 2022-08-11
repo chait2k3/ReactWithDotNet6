@@ -4,13 +4,36 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using API.Entities;
+using Microsoft.AspNetCore.Identity;
 
 namespace API.Data
 {
     public static class DbInitializer
     {
-        public static void Initialize(StoreContext storeContext) 
+        public static async Task Initialize(StoreContext storeContext, UserManager<User> userManager) 
         {
+            // create default users
+            if(!userManager.Users.Any())
+            {
+                var user = new User
+                {
+                    UserName = "cs",
+                    Email = "cs@test.com"
+                };
+                
+                await userManager.CreateAsync(user, "Welcome@123");
+                await userManager.AddToRoleAsync(user, "MEMBER");
+
+                var admin = new User
+                {
+                    UserName = "admin",
+                    Email = "admin@test.com"
+                };
+                
+                await userManager.CreateAsync(admin, "Welcome@123");
+                await userManager.AddToRolesAsync(admin, new[] {"ADMIN","MEMBER"});
+            }
+
             // if products are already present then exit
             if(storeContext.Products.Any()) return;
 

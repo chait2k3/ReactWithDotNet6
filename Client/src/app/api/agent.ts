@@ -1,12 +1,21 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { toast } from 'react-toastify';
 import { PaginatedResponse } from '../models/pagination';
+import { store } from '../store/configure-store';
 
 const sleep = () => new Promise(resolve => setTimeout(resolve, 500));
 
 axios.defaults.baseURL = "http://localhost:5001/api/";
 axios.defaults.withCredentials = true;  // for using cookies, user credentials etc
 
+// for authorization header
+axios.interceptors.request.use(config => {
+    const token = store.getState().account.user?.token;
+    if(token) config.headers!.Authorization = `Bearer ${token}`;
+    return config;
+});
+
+// for pagination header and errors
 axios.interceptors.response.use(async response => {
     if (process.env.NODE_ENV === 'development') await sleep();
     
@@ -77,13 +86,20 @@ const Catalog = {
 };
 
 const Basket = {
-    get: () => requests.get('basket'),
+    get: () => requests.get("basket"),
     addItem: (productId: number, quantity = 1) => requests.post(`basket?productId=${productId}&quantity=${quantity}`, {}),
     removeItem: (productId: number, quantity = 1) => requests.delete(`basket?productId=${productId}&quantity=${quantity}`)
 };
 
+const Account = {
+    login: (values: any) => requests.post("account/login", values),
+    register: (values: any) => requests.post("account/register", values),
+    currentUser: () => requests.get("account/currentuser")
+};
+
 const agent = {
     TestErrors,
+    Account,
     Catalog,
     Basket
 };

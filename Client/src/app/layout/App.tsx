@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Route, Routes } from "react-router-dom";
 import { createTheme, CssBaseline, ThemeProvider } from "@mui/material";
 import { Container } from "@mui/system";
@@ -16,31 +16,32 @@ import ProductDetails from "../../features/catalog/product-details";
 import ServerError from '../errors/server-error';
 import NotFoundError from '../errors/not-found-error';
 import BasketPage from "../../features/basket/basket-page";
-import { getCookie } from '../utils/utils';
-import agent from '../api/agent';
 import LoadingComponent from './loading-component';
 import CheckoutPage from '../../features/checkout/checkout-page';
 import { useAppDispatch } from '../store/configure-store';
-import { setBasket } from '../../features/basket/basket-slice';
+import { fetchBasketAsync } from '../../features/basket/basket-slice';
+import Login from '../../features/account/login';
+import Register from '../../features/account/register';
+import { fetchCurrentUserAsync } from '../../features/account/account-slice';
+import PrivateRoute from './private-route';
 
 const App = () => {
   const dispatch = useAppDispatch();
-
   const [loading, setLoading] = useState(true);
-  
   const [darkMode, setDarkMode] = useState(false);
 
-  useEffect(() => {
-    const buyerId = getCookie("buyerId");
-    if(buyerId) {
-      agent.Basket.get()
-        .then(data => dispatch(setBasket(data)))
-        .catch(error => console.log(error))
-        .finally(() => setLoading(false));
-    } else {
-      setLoading(false);
+  const initApp = useCallback(async () => {
+    try {
+      await dispatch(fetchCurrentUserAsync());
+      await dispatch(fetchBasketAsync());
+    } catch (error) {
+      console.log(error);
     }
   },[dispatch]);
+
+  useEffect(() => {
+    initApp().then(() => setLoading(false));
+  },[initApp]);
 
   const theme = createTheme({
     palette: {
@@ -67,10 +68,14 @@ const App = () => {
           <Route path="/" element={<HomePage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
           <Route path="/catalog" element={<Catalog />} />
           <Route path="/catalog/:id" element={<ProductDetails />} />
           <Route path="/basket" element={<BasketPage />} />
-          <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/checkout" element={<PrivateRoute>
+                                            <CheckoutPage />
+                                          </PrivateRoute>} />
           <Route path="/server-error" element={<ServerError />} />
           <Route path="*" element={<NotFoundError />} />
         </Routes>
