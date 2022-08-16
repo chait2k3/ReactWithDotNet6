@@ -24,6 +24,7 @@ import Login from '../../features/account/login';
 import Register from '../../features/account/register';
 import { fetchCurrentUserAsync } from '../../features/account/account-slice';
 import PrivateRoute from './private-route';
+import OrdersPage from '../../features/orders/orders-page';
 
 const App = () => {
   const dispatch = useAppDispatch();
@@ -75,6 +76,9 @@ const App = () => {
           <Route path="/basket" element={<BasketPage />} />
           <Route path="/checkout" element={<PrivateRoute>
                                             <CheckoutPage />
+                                          </PrivateRoute>} />
+          <Route path="/orders" element={<PrivateRoute>
+                                            <OrdersPage />
                                           </PrivateRoute>} />
           <Route path="/server-error" element={<ServerError />} />
           <Route path="*" element={<NotFoundError />} />

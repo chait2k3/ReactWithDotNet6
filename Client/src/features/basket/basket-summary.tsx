@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import { FC, Fragment } from "react";
 import { currencyFormat } from '../../app/utils/utils';
 import { useAppSelector } from '../../app/store/configure-store';
 import {
@@ -10,11 +10,18 @@ import {
   TableCell,
 } from "@mui/material";
 
-const BasketSummary = () => {
+interface BasketSummaryProps {
+  subtotal?: number;
+}
+
+const BasketSummary:FC<BasketSummaryProps> = ({ subtotal }) => {
   const { basket } = useAppSelector(state => state.basket);
-  const subtotal = basket?.items.reduce((acc, currItem) => {
-    return acc + (currItem.price * currItem.quantity);
-  }, 0) ?? 0;
+  if (subtotal === undefined) {
+    subtotal = basket?.items.reduce((acc, currItem) => {
+      return acc + (currItem.price * currItem.quantity);
+    }, 0) ?? 0;
+  }
+    
   const deliveryFee = subtotal > 10000 ? 0 : 500;
 
 
