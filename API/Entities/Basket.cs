@@ -10,7 +10,9 @@ namespace API.Entities
         public int Id { get; set; }
         public string BuyerId { get; set; }
         public List<BasketItem> Items { get; set; } = new List<BasketItem>();
-
+        public string PaymentIntentId { get; set; }
+        public string ClientSecret { get; set; }
+        
         public void AddItem(Product product, int quantity) {
             //if product is not already added then add new one else increase quantity
             if(Items.All(item => item.ProductId != product.Id)) 

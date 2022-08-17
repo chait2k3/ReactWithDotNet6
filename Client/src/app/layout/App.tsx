@@ -17,7 +17,6 @@ import ServerError from '../errors/server-error';
 import NotFoundError from '../errors/not-found-error';
 import BasketPage from "../../features/basket/basket-page";
 import LoadingComponent from './loading-component';
-import CheckoutPage from '../../features/checkout/checkout-page';
 import { useAppDispatch } from '../store/configure-store';
 import { fetchBasketAsync } from '../../features/basket/basket-slice';
 import Login from '../../features/account/login';
@@ -25,6 +24,7 @@ import Register from '../../features/account/register';
 import { fetchCurrentUserAsync } from '../../features/account/account-slice';
 import PrivateRoute from './private-route';
 import OrdersPage from '../../features/orders/orders-page';
+import CheckoutWrapper from '../../features/checkout/checkout-wrapper';
 
 const App = () => {
   const dispatch = useAppDispatch();
@@ -75,7 +75,7 @@ const App = () => {
           <Route path="/catalog/:id" element={<ProductDetails />} />
           <Route path="/basket" element={<BasketPage />} />
           <Route path="/checkout" element={<PrivateRoute>
-                                            <CheckoutPage />
+                                            <CheckoutWrapper />
                                           </PrivateRoute>} />
           <Route path="/orders" element={<PrivateRoute>
                                             <OrdersPage />

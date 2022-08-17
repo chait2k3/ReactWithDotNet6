@@ -3,7 +3,7 @@ namespace API.Entities.OrderAggregrate
     public enum OrderStatus
     {
         Pending,
-        PaymentReveived,
+        PaymentReceived,
         PaymentFailed
     }
 }
