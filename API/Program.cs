@@ -109,6 +109,13 @@ if (app.Environment.IsDevelopment())
 // http request redirection
 // app.UseHttpsRedirection();
 
+app.UseRouting();
+
+// serve static files for react app
+app.UseDefaultFiles();
+app.UseStaticFiles();
+
+
 // global cors policy
 app.UseCors(x =>
     x.AllowAnyHeader()
@@ -123,5 +130,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapFallbackToController("Index", "Fallback");
 
 await app.RunAsync();

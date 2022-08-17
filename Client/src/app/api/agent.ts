@@ -5,7 +5,7 @@ import { store } from '../store/configure-store';
 
 const sleep = () => new Promise(resolve => setTimeout(resolve, 500));
 
-axios.defaults.baseURL = "http://localhost:5001/api/";
+axios.defaults.baseURL = process.env.REACT_APP_API_URL;
 axios.defaults.withCredentials = true;  // for using cookies, user credentials etc
 
 // for authorization header
