@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
+using API.RequestHelpers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,9 +19,9 @@ builder.Services.AddControllers();
 
 // for identity framework
 builder.Services.AddIdentityCore<User>(opt =>
-{
-    opt.User.RequireUniqueEmail = true;
-})
+                {
+                    opt.User.RequireUniqueEmail = true;
+                })
                 .AddRoles<Role>()
                 .AddEntityFrameworkStores<StoreContext>();
 
@@ -43,6 +44,7 @@ builder.Services.AddAuthorization();
 // add token service
 builder.Services.AddScoped<TokenService>();
 builder.Services.AddScoped<PaymentService>();
+builder.Services.AddScoped<ImageService>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -112,6 +114,9 @@ builder.Services.AddDbContext<StoreContext>(options => {
     // or from the environment variable from Heroku, use it to set up your DbContext.
     options.UseNpgsql(connStr);
 });
+
+// add auto mappers
+builder.Services.AddAutoMapper(typeof(MappingProfiles).Assembly);
 
 var app = builder.Build();
 
