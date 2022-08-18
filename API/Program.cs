@@ -17,14 +17,16 @@ builder.Services.AddCors();
 builder.Services.AddControllers();
 
 // for identity framework
-builder.Services.AddIdentityCore<User>(opt => {
-                    opt.User.RequireUniqueEmail = true;
-                })
+builder.Services.AddIdentityCore<User>(opt =>
+{
+    opt.User.RequireUniqueEmail = true;
+})
                 .AddRoles<Role>()
                 .AddEntityFrameworkStores<StoreContext>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(opt => {
+                .AddJwtBearer(opt =>
+                {
                     opt.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuer = false,
@@ -44,9 +46,10 @@ builder.Services.AddScoped<PaymentService>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c => {
-    c.SwaggerDoc("v1", new OpenApiInfo{ Title = "API", Version= " V1"});
-    
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = " V1" });
+
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Description = "JWT auth header",
@@ -55,7 +58,7 @@ builder.Services.AddSwaggerGen(c => {
         Type = SecuritySchemeType.ApiKey,
         Scheme = "Bearer"
     });
-    
+
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
@@ -76,7 +79,39 @@ builder.Services.AddSwaggerGen(c => {
 });
 
 // Add db context
-builder.Services.AddDbContext<StoreContext>(); 
+builder.Services.AddDbContext<StoreContext>(options => {
+    var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+    string connStr;
+
+    if (env == "Development")
+    {
+        // Use connection string from file.
+        connStr = builder.Configuration.GetConnectionString("PGServerConnection");
+    }
+    else
+    {
+        // Use connection string provided at runtime by Heroku.
+        var connUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+
+        // Parse connection URL to connection string for Npgsql
+        // postgresql://appuser:welcome123@localhost:5432/store
+        connUrl = connUrl.Replace("postgres://", string.Empty);
+        var pgUserPass = connUrl.Split("@")[0];
+        var pgHostPortDb = connUrl.Split("@")[1];
+        var pgHostPort = pgHostPortDb.Split("/")[0];
+        var pgDb = pgHostPortDb.Split("/")[1];
+        var pgUser = pgUserPass.Split(":")[0];
+        var pgPass = pgUserPass.Split(":")[1];
+        var pgHost = pgHostPort.Split(":")[0];
+        var pgPort = pgHostPort.Split(":")[1];
+
+        connStr = $"Server={pgHost};Port={pgPort};User Id={pgUser};Password={pgPass};Database={pgDb};SSL Mode=Require;Trust Server Certificate=true";
+    }
+
+    // Whether the connection string came from the local development configuration file
+    // or from the environment variable from Heroku, use it to set up your DbContext.
+    options.UseNpgsql(connStr);
+});
 
 var app = builder.Build();
 
@@ -90,7 +125,8 @@ try
 {
     await dbContext.Database.MigrateAsync();
     await DbInitializer.Initialize(dbContext, userManager);
-} catch(Exception ex) 
+}
+catch (Exception ex)
 {
     logger.LogError(ex, "Problem in migrating data");
 }

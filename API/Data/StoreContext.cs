@@ -12,16 +12,20 @@ namespace API.Data
         {
         }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        /*protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             var configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json")
                 .Build();
 
-            var connectionString = configuration.GetConnectionString("DefaultConnection");
-            optionsBuilder.UseSqlite(connectionString);
-        }
+            //var connectionString = configuration.GetConnectionString("DefaultConnection");
+            //optionsBuilder.UseSqlite(connectionString);
+            
+            var connectionString = configuration.GetConnectionString("PGServerConnection");
+            optionsBuilder.UseNpgsql(connectionString);
+        
+        } */
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
