@@ -76,6 +76,11 @@ const Header: FC<HeaderProps> = (props) => {
               {title}
             </ListItem>
           ))}
+          { user && user.roles?.includes("ADMIN") && (
+          <ListItem component={NavLink} to='/inventory' sx={navStyles}>
+              Inventory
+          </ListItem>
+          )}
         </List>
 
         <Box display="flex" alignItems="center">

@@ -25,6 +25,7 @@ import { fetchCurrentUserAsync } from '../../features/account/account-slice';
 import PrivateRoute from './private-route';
 import OrdersPage from '../../features/orders/orders-page';
 import CheckoutWrapper from '../../features/checkout/checkout-wrapper';
+import Inventory from '../../features/admin/inventory';
 
 const App = () => {
   const dispatch = useAppDispatch();
@@ -79,6 +80,9 @@ const App = () => {
                                           </PrivateRoute>} />
           <Route path="/orders" element={<PrivateRoute>
                                             <OrdersPage />
+                                          </PrivateRoute>} />
+          <Route path="/inventory" element={<PrivateRoute roles={["ADMIN"]}>
+                                            <Inventory />
                                           </PrivateRoute>} />
           <Route path="/server-error" element={<ServerError />} />
           <Route path="*" element={<NotFoundError />} />

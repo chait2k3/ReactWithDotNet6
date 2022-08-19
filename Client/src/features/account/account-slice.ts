@@ -60,7 +60,10 @@ export const accountSlice = createSlice({
     initialState,
     reducers: {
         setUser: (state, action) => {
-            state.user = action.payload;
+            //extract roles from the token
+            let claims = JSON.parse(atob(action.payload.token.split(".")[1]));
+            let roles = claims["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+            state.user = {...action.payload, roles: typeof(roles) === 'string' ? [roles] : roles};
         },
         signOut: (state) => {
             state.user = null;
@@ -75,7 +78,10 @@ export const accountSlice = createSlice({
         builder.addMatcher(
             isAnyOf(signInUserAsync.fulfilled, fetchCurrentUserAsync.fulfilled),
             (state, action) => {
-                state.user = action.payload;
+                //extract roles from the token
+                const claims = JSON.parse(atob(action.payload.token.split(".")[1]));
+                const roles = claims["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+                state.user = {...action.payload, roles: typeof(roles) === 'string' ? [roles] : roles};
             }
         );
         builder.addMatcher(

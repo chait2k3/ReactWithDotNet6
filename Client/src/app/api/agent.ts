@@ -62,7 +62,7 @@ const requests = {
     }).then(responseBody)
 }
 
-function createFormData(item: any) {
+const createFormData = (item: any) => {
     let formData = new FormData();
     for (const key in item) {
         formData.append(key, item[key])
@@ -77,6 +77,12 @@ const TestErrors = {
     get404Error: () => requests.get('buggy/not-found'),
     get500Error: () => requests.get('buggy/server-error'),
     getValidationError: () => requests.get('buggy/validation-error'),
+};
+
+const Admin = {
+    createProduct: (product: any) => requests.postForm("products", createFormData(product)),
+    updateProduct: (product: any) => requests.putForm("products", createFormData(product)),
+    deleteProduct: (id: number) => requests.delete(`products/${id}`)        
 };
 
 const Catalog = {
@@ -114,7 +120,8 @@ const agent = {
     Catalog,
     Basket,
     Orders,
-    Payments
+    Payments,
+    Admin
 };
 
 export default agent;
